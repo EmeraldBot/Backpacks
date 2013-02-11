@@ -1,0 +1,5 @@
+#interval between backpack saves to disk. Defaul: 6000 (5 minutes)
+save-interval: 6000
+#If set to true and a user tries to open a pack
+#in a world that isn't configured, deny it
+configured-world-only: true

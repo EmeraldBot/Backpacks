@@ -1,0 +1,8 @@
+name: Backpacks
+version: 1.0
+main: org.darkcraft.backpacks.Backpacks
+author: Darq_Alder
+
+license: WTFPL
+description: Multiple, multi-world backpacks
+    

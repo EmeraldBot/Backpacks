@@ -27,7 +27,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
         
         if (!s.hasPermission("backpack.inspect")) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
-            return false;
+            return true;
         }
         
         if (args.length < 1) {
@@ -51,7 +51,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
 
         BackpackManager manager = plugin.getManager(world);
         if (manager == null) {
-            s.sendMessage(ChatColor.RED + "Sorry, can not do that in this world");
+            s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
         

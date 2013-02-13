@@ -24,7 +24,7 @@ public class CmdCreateBackpack implements CommandExecutor {
         if (!s.hasPermission("backpack.create.default")
                 && !named) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
-            return false;
+            return true;
         }
         
         String backpack = "default";
@@ -50,7 +50,7 @@ public class CmdCreateBackpack implements CommandExecutor {
 
         BackpackManager manager = plugin.getManager(world);
         if (manager == null) {
-            s.sendMessage(ChatColor.RED + "Sorry, can not do that in this world");
+            s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
         

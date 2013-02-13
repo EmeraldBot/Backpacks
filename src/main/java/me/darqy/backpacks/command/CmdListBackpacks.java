@@ -23,7 +23,7 @@ public class CmdListBackpacks implements CommandExecutor {
         if (!s.hasPermission("backpack.list")
                 && !other) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
-            return false;
+            return true;
         }
         
         String world = args.length >= 1 ? args[0] : s instanceof Player? ((Player)s).getWorld().getName() : null;
@@ -39,7 +39,7 @@ public class CmdListBackpacks implements CommandExecutor {
 
         BackpackManager manager = plugin.getManager(world);
         if (manager == null) {
-            s.sendMessage(ChatColor.RED + "Sorry, can not do that in this world");
+            s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
         

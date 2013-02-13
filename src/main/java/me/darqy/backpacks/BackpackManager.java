@@ -34,8 +34,12 @@ public class BackpackManager {
     }
     
     public boolean hasBackpack(String player, String backpack) {
-        return backpacks.containsKey(player)
-                && backpacks.get(player).containsKey(backpack);
+        checkPlayer(player);
+        return backpacks.get(player).containsKey(backpack);
+    }
+    
+    public Backpack getDefaultBackpack(String player) {
+        return getBackpack(player, "default");
     }
     
     public Backpack getBackpack(String player, String backpack) {
@@ -55,6 +59,19 @@ public class BackpackManager {
         backpacks.get(player).put(backpack, pack);
     }
     
+    public void renameBackpack(String player, String backpack, String newname) {
+        Backpack pack = getBackpack(player, backpack);
+        if (pack == null) {
+            return;
+        }
+        
+        pack.rename(newname);
+        
+        nbts.get(player).remove(backpack);
+        backpacks.get(player).remove(backpack);
+        setBackpack(player, newname, pack);
+    }
+    
     public List<String> getBackpackList(String player) {
         checkPlayer(player);
         List<String> list = new ArrayList();
@@ -71,8 +88,10 @@ public class BackpackManager {
     public void saveBackpacks() throws IOException {
         for (String player : backpacks.keySet()) {
             checkPlayer(player);
-            for (String backpack : backpacks.get(player).keySet()) {
-                Backpack pack = backpacks.get(player).get(backpack);
+            Map<String, Backpack> playerpacks = backpacks.get(player);
+            
+            for (String backpack : playerpacks.keySet()) {
+                Backpack pack = playerpacks.get(backpack);
                 
                 if (pack == null) {
                     continue;
@@ -90,10 +109,25 @@ public class BackpackManager {
         }
     }
     
+    public void closeBackpacks() {
+        for (String player : backpacks.keySet()) {
+            Map<String, Backpack> playerpacks = backpacks.get(player);
+            
+            for (String backpack : playerpacks.keySet()) {
+                Backpack pack = playerpacks.get(backpack);
+                if (pack == null) {
+                    continue;
+                }
+                
+                pack.closeAll();
+            }
+        }
+    }
+    
     private void saveBackpackToNBT(String player, String backpack, Backpack pack) {
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setString("Name", backpack);
-        InventoryUtil.InventoryToNBT(nbt, pack.getInventory());
+        InventoryUtil.invToNbt(nbt, pack.getInventory());
         nbts.get(player).setCompound(backpack, nbt);
     }
     

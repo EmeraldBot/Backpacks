@@ -13,10 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import me.darqy.backpacks.command.CmdBackpack;
-import me.darqy.backpacks.command.CmdCreateBackpack;
-import me.darqy.backpacks.command.CmdInspectBackpack;
-import me.darqy.backpacks.command.CmdListBackpacks;
+import me.darqy.backpacks.command.*;
 
 public class Backpacks extends JavaPlugin {
     
@@ -40,6 +37,7 @@ public class Backpacks extends JavaPlugin {
     
     @Override
     public void onDisable() {
+        closeAllBackpacks();
         saveAllBackpacks();
     }
     
@@ -50,6 +48,12 @@ public class Backpacks extends JavaPlugin {
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "Error while saving backpack!", e);
             }
+        }
+    }
+    
+    public void closeAllBackpacks() {
+        for (BackpackManager mngr : managers.values()) {
+            mngr.closeBackpacks();
         }
     }
     
@@ -105,6 +109,7 @@ public class Backpacks extends JavaPlugin {
         getCommand("backpack").setExecutor(new CmdBackpack(this));
         getCommand("inspectpack").setExecutor(new CmdInspectBackpack(this));
         getCommand("listpacks").setExecutor(new CmdListBackpacks(this));
+        getCommand("packtools").setExecutor(new CmdBackpackTools(this));
     }
     
     private void scheduleBackpackSaver() {

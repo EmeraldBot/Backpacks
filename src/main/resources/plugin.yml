@@ -1,25 +1,28 @@
 name: Backpacks
 version: 1.0
-main: org.darkcraft.backpacks.Backpacks
+main: me.darqy.backpacks.Backpacks
 author: Darq_Alder
 
-license: WTFPL
 description: Multiple, multi-world backpacks
 commands:
   createpack:
     description: Creates a new backpack
-    usage: /<command> (name) (player) (world)
+    usage: /<command> (backpack) (player) (world)
     aliases: [cpack]
   backpack:
-    description: Opens the player's backpack to them
-    usage: /<command> (name)
+    description: Opens the player's backpack
+    usage: /<command> (backpack)
     aliases: [pack]
   inspectpack:
     description: Opens a read-only version of a backpack
-    usage: /<command> [player] (name) (world)
+    usage: /<command> [player] (backpack) (world)
     aliases: [ipack]
   listpacks:
     description: Lists a player's backpacks in a given world
     usage: /<command> (world) (player)
     aliases: [lpacks]
+  packtools:
+    description: Various utilities to make your Backpack awesome!
+    usage: /<command> [action] (p:[backpack])
+    aliases: [upack, packutils]
     

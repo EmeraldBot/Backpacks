@@ -28,22 +28,19 @@ public class CmdBackpack implements CommandExecutor {
         if (!s.hasPermission("backpack.use.default")
                 && !named) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
-            return false;
+            return true;
         }
         
-        String backpack = "default";
-        if (args.length >= 1 && named) {
-            backpack = args[0].toLowerCase();
-        }
+        String backpack = args.length >= 1 && named?
+                args[0].toLowerCase() : "default";
 
         BackpackManager manager = plugin.getManager(((Player) s).getWorld());
         if (manager == null) {
-            s.sendMessage(ChatColor.RED + "Sorry, can not do that in this world");
+            s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
         
         Backpack pack = manager.getBackpack(s.getName(), backpack);
-        
         if (pack == null) {
             s.sendMessage(ChatColor.RED + "You don't have that backpack.");
             return true;

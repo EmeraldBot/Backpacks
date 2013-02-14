@@ -1,5 +1,5 @@
 name: Backpacks
-version: 1.0
+version: 1.1
 main: me.darqy.backpacks.Backpacks
 author: Darq_Alder
 softdepend: [Lockette, Deadbolt]

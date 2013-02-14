@@ -84,7 +84,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
         String lArg = args[args.length - 1];
         if (lArg.startsWith("p:") || lArg.startsWith("P:")) {
             String[] parts = lArg.split(":");
-            if (parts.length == 2) backpack = parts[0];
+            if (parts.length == 2) backpack = parts[1];
         }
 
         Backpack pack = manager.getBackpack(player, backpack);

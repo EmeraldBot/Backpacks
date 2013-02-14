@@ -21,8 +21,8 @@ commands:
     description: Lists a player's backpacks in a given world
     usage: /<command> (world) (player)
     aliases: [lpacks]
-  packtools:
-    description: Various utilities to make your Backpack awesome!
+  packutils:
+    description: Various utilities to help manage your backpack
     usage: /<command> [action] (p:[backpack])
-    aliases: [upack, packutils]
+    aliases: [upack]
     

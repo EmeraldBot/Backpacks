@@ -21,14 +21,23 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class CmdBackpackTools implements CommandExecutor  {
+public class CmdBackpackUtils implements CommandExecutor  {
     
     private Backpacks plugin;
     private MagnetListener magnet = this.new MagnetListener();
     
-    private static String[] TOOLS = new String[]{"magnet", "empty", "rename", "chest"};
+    private static final String[] TOOLS = new String[] {
+        "magnet", "chest", "rename", "empty",
+    };
     
-    public CmdBackpackTools(Backpacks instance) {
+    private static final String MAGNET_USAGE = "magnet";
+    private static final String CHEST_USAGE = "chest [put|take] [item|id|all]";
+    private static final String RENAME_USAGE = "rename [new-pack]";
+    private static final String EMPTY_USAGE = "empty";
+    
+    
+    
+    public CmdBackpackUtils(Backpacks instance) {
         this.plugin = instance;
         
         plugin.getServer().getPluginManager().registerEvents(magnet, plugin);
@@ -45,18 +54,18 @@ public class CmdBackpackTools implements CommandExecutor  {
         final String player = p.getName();
                         
         if (args.length < 1) {
-            handleHelp(p, null, l);
+            handleHelp(c, p, null, l);
             return true;
         }
         
-        if ("help".equals(args[0].toLowerCase())) {
-            handleHelp(p, args.length >= 2? args[1].toLowerCase(): null, l);
+        if ("help".equalsIgnoreCase(args[0])) {
+            handleHelp(c, p, args.length >= 2? args[1].toLowerCase(): null, l);
             return true;
         }
 
         final String action = getTool(args[0]);
         if (action == null) {
-            handleHelp(p, args[0], l);
+            handleHelp(c, p, args[0], l);
             return true;
         }
         
@@ -72,10 +81,10 @@ public class CmdBackpackTools implements CommandExecutor  {
         }
 
         String backpack = "default";
-        for (String arg : args) {
-            if (arg.startsWith("p:") || arg.startsWith("P:")) {
-                backpack = arg.split(":")[1].toLowerCase();
-            }
+        String lArg = args[args.length - 1];
+        if (lArg.startsWith("p:") || lArg.startsWith("P:")) {
+            String[] parts = lArg.split(":");
+            if (parts.length == 2) backpack = parts[0];
         }
 
         Backpack pack = manager.getBackpack(player, backpack);
@@ -89,26 +98,23 @@ public class CmdBackpackTools implements CommandExecutor  {
         } else if ("chest".equals(action)) {
             if (args.length < 3) {
                 p.sendMessage(ChatColor.RED + "Not enough arguments.");
-                p.sendMessage(ChatColor.RED + c.getUsage().replace("<command>", l)
-                        .concat(" [put|take] [item|*]"));
+                p.sendMessage(getUsage(c, ChatColor.YELLOW, l, CHEST_USAGE));
                 return true;
             }
-            String method = args.length >= 3? args[2] : args[1];
-            String item = args.length >= 4? args[3] : args[2];
-            handleChestTransfer(p, pack, method, item);
+            handleChestTransfer(p, pack, args[1], args[2]);
         } else if ("rename".equals(action)) {
-            if (args.length < 2) {
+            if (args.length < 3) {
                 p.sendMessage(ChatColor.RED + "Not enough arguments.");
-                p.sendMessage(ChatColor.RED + c.getUsage().replace("<command>", l)
-                        .concat(" [newname]"));
+                p.sendMessage(getUsage(c, ChatColor.YELLOW, l, RENAME_USAGE)
+                        .replace("(p:[backpack])", "[p:old-pack]"));
                 return true;
             }
-            String newname = args.length >= 3? args[2] : args[1];
-            handleRename(p, manager, backpack, newname.toLowerCase());
+            handleRename(p, manager, backpack, args[1].toLowerCase());
         } else if ("empty".equals(action)) {
             if (args.length < 2) {
                 p.sendMessage(ChatColor.RED + "Not enough arguments.");
-                p.sendMessage(ChatColor.RED + c.getUsage().replace("<command>", l));
+                p.sendMessage(getUsage(c, ChatColor.YELLOW, l, EMPTY_USAGE)
+                        .replace("(p:[backpack])", "[p:old-pack]"));
                 return true;
             }
             handleEmpty(p, pack, backpack);
@@ -170,78 +176,67 @@ public class CmdBackpackTools implements CommandExecutor  {
     
     private void handleEmpty(Player p, Backpack pack, String backpack) {
         pack.getInventory().clear();
-        p.sendMessage(ChatColor.YELLOW + "Your \"" + backpack + "\" backpack was emptied!");
+        p.sendMessage(ChatColor.YELLOW + "Your \"" + backpack + "\" backpack is now empty!");
     }
     
-    public void handleHelp(Player p, String action, String l) {
+    public void handleHelp(Command c, Player p, String action, String l) {
         if (action == null) {
-            p.sendMessage(ChatColor.YELLOW + "Unknown action. Available: ");
-            for (String tool : TOOLS) {
-                if (p.hasPermission("backpack.tool." + tool)) {
-                    p.sendMessage("- " + ChatColor.AQUA + tool);
-                }
-            }
-            p.sendMessage(ChatColor.YELLOW + "Do \"/" + l + " help <tool-name>\" for"
-                    + " information and usage");
+            sendUtils(p, l);
         } else if ("magnet".equals(action)) {
+            sendHelpText(p, "Usage: " + getUsage(c, ChatColor.RED, l, MAGNET_USAGE));
             sendHelpText(p, "Toggling magnet mode on a backpack allows it to"
-                    + " collect the items you pickup from the ground, instead of"
-                    + " those items being collected into your normal inventory.");
-            sendHelpText(p, "---");
-            sendHelpText(p, "You must have the room for an item in your normal"
-                    + " inventory in order for the item to be collected into"
-                    + " your backpack.");
-            sendHelpText(p, "When your backpack is full, you will be notified and"
+                    + " collect items directly as you pick them up from the ground.");
+            sendHelpText(p, ChatColor.GRAY + "---");
+            sendHelpText(p, "- In order for an item to be collected by the backpack,"
+                    + " your player inventory must also have space for the item");
+            sendHelpText(p, "- When your backpack is full, you will be notified and"
                     + " magnet mode will be automatically disabled.");
-            sendHelpText(p, "---");
+            sendHelpText(p, ChatColor.GRAY + "---");
             sendHelpText(p, "Example usage:");
             sendHelpText(p, " - /" + l +" magnet - Enables magnet on your default backpack");
             sendHelpText(p, " - /" + l +" magnet p:collecter - Enables magnet on your \"collector\""
                     + " backpack");
             sendHelpText(p, " - /" + l +" magnet (after enabled) - disable magnet mode");
         } else if ("chest".equals(action)) {
-            sendHelpText(p, " Safely move items from your backpack into a chest, or"
-                    + " from a chest into your backpack.");
-            sendHelpText(p, "---");
-            sendHelpText(p, " You must be looking at the chest you wish to transfer"
+            sendHelpText(p, "Usage: " + getUsage(c, ChatColor.RED, l, CHEST_USAGE));
+            sendHelpText(p, " Transfers items from your pack into a chest, and"
+                    + " vica versa");
+            sendHelpText(p, ChatColor.GRAY + "---");
+            sendHelpText(p, "- You must be looking at the chest you wish to transfer"
                     + " items with.");
-            sendHelpText(p, "---");
+            sendHelpText(p, ChatColor.GRAY + "---");
             sendHelpText(p, "Example usage:");
-            sendHelpText(p, " - /" + l +" chest put stone - Move as much stone as possible"
+            sendHelpText(p, " - /" + l +" chest put stone - Transfers as much stone as possible"
                     + " from your \"default\" backpack into the chest");
-            sendHelpText(p, " - /" + l +" chest p:random take * - Moves as many items from the chest"
-                    + " into your \"random\" backpack as possible");
+            sendHelpText(p, " - /" + l +" chest take all p:random - Transfers as manys items as possible"
+                    + " can from the chest to your \"random\" backpack");
         } else if ("rename".equals(action)) {
-            sendHelpText(p, " Renames a backpack");
-            sendHelpText(p, "---");
-            sendHelpText(p, "Example usage:");
-            sendHelpText(p, " - /" + l +" rename p:apack other - Rename your \"apack\" backpack to \"other\"");
-            sendHelpText(p, " - /" + l +" rename apack - Rename your \"default\" backpack to \"apack\"");
+            sendHelpText(p, "Usage: " + getUsage(c, ChatColor.RED, l, RENAME_USAGE)
+                    .replace("(p:[backpack])", "[p:old-pack]"));
+            sendHelpText(p, " Rename a backpack");
+            sendHelpText(p, ChatColor.GRAY + "---");
+            sendHelpText(p, "Examples:");
+            sendHelpText(p, " - /" + l +" rename diamonds p:mining - Rename your \"mining\" backpack to \"diamonds\"");
         } else if ("empty".equals(action)) {
+            sendHelpText(p, "Usage: " + getUsage(c, ChatColor.RED, l, EMPTY_USAGE)
+                    .replace("(p:[backpack])", "[p:old-pack]"));
             sendHelpText(p, " Empties a backpack");
-            sendHelpText(p, "---");
-            sendHelpText(p, ChatColor.GOLD + "WARNING: this operation cannot be undone!!"
-                    + " You will lose the items in the pack forever.");
-            sendHelpText(p, "---");
+            sendHelpText(p, ChatColor.GRAY + "---");
+            sendHelpText(p, ChatColor.GOLD + "- WARNING: this operation cannot be undone!!"
+                    + " You will lose the items in the pack forever");
+            sendHelpText(p, ChatColor.GRAY + "---");
             sendHelpText(p, "Example usage:");
-            sendHelpText(p, " - /" + l +" empty p:apack - Empty your \"apack\" backpack");
+            sendHelpText(p, " - /" + l +" empty p:default - Empties your \"default\" backpack");
         } else {
-            p.sendMessage(ChatColor.YELLOW + "Unknown tool: " + action + ". Available:");
-            for (String tool : TOOLS) {
-                if (p.hasPermission("backpack.tool." + tool)) {
-                    p.sendMessage("- " + ChatColor.AQUA + tool);
-                }
-            }
-            p.sendMessage(ChatColor.YELLOW + "Do \"/" + l + " help <tool-name>\" for"
-                    + " information and usage");
+            sendUtils(p, l);
         }
     }
     
-    private void sendHelpText(Player p, String message) {
+    private static void sendHelpText(Player p, String message) {
         p.sendMessage(ChatColor.YELLOW + message);
     }
     
-    private String getTool(String filter) {
+    private static String getTool(String filter) {
         for (String tool : TOOLS) {
             if (tool.equalsIgnoreCase(filter)) {
                 return tool;
@@ -249,7 +244,24 @@ public class CmdBackpackTools implements CommandExecutor  {
         }
         return null;
     }
-
+    
+    private static String getUsage(Command c, ChatColor color, String label, String usage) {
+        return color + c.getUsage()
+                .replace("[action]", usage)
+                .replace("<command>", label);
+    }
+    
+    private static void sendUtils(CommandSender sender, String l) {
+            sender.sendMessage(ChatColor.YELLOW + "Unknown utility. Available utils: ");
+            for (String tool : TOOLS) {
+                if (sender.hasPermission("backpack.util." + tool)) {
+                    sender.sendMessage("- " + ChatColor.AQUA + tool);
+                }
+            }
+            sender.sendMessage(ChatColor.YELLOW + "Do " + ChatColor.RED
+                    + "/" + l + " help [util] " + ChatColor.YELLOW + "for information and usage");
+    }
+            
     private class MagnetListener implements Listener {
         
         private Map<String, Backpack> magnets = new HashMap();

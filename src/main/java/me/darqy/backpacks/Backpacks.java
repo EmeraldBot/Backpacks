@@ -109,7 +109,7 @@ public class Backpacks extends JavaPlugin {
         getCommand("backpack").setExecutor(new CmdBackpack(this));
         getCommand("inspectpack").setExecutor(new CmdInspectBackpack(this));
         getCommand("listpacks").setExecutor(new CmdListBackpacks(this));
-        getCommand("packtools").setExecutor(new CmdBackpackTools(this));
+        getCommand("packutils").setExecutor(new CmdBackpackUtils(this));
     }
     
     private void scheduleBackpackSaver() {

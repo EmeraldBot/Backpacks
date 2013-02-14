@@ -69,7 +69,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
             return true;
         }
         
-        if (!p.hasPermission("backpack.tool." + action)) {
+        if (!p.hasPermission("backpack.util." + action)) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -141,9 +141,14 @@ public class CmdBackpackUtils implements CommandExecutor  {
             p.sendMessage(ChatColor.RED + "You must be looking at a chest to do that");
             return;
         }
+        
+        if (!plugin.checkProtection(p, target) && !p.hasPermission("backpack.util.chest.bypass")) {
+            p.sendMessage(ChatColor.RED + "Sorry, you do not have access to that chest.");
+            return;
+        }
+        
         Chest chest = (Chest) target.getState();
 
-        //todo: Deadbolt/lockette hooks
         Inventory from, to;
         if (action.equalsIgnoreCase("put")) {
             to = chest.getInventory();
@@ -254,9 +259,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
     private static void sendUtils(CommandSender sender, String l) {
             sender.sendMessage(ChatColor.YELLOW + "Unknown utility. Available utils: ");
             for (String tool : TOOLS) {
-                if (sender.hasPermission("backpack.util." + tool)) {
-                    sender.sendMessage("- " + ChatColor.AQUA + tool);
-                }
+                sender.sendMessage("- " + ChatColor.AQUA + tool);
             }
             sender.sendMessage(ChatColor.YELLOW + "Do " + ChatColor.RED
                     + "/" + l + " help [util] " + ChatColor.YELLOW + "for information and usage");

@@ -1,5 +1,6 @@
 package me.darqy.backpacks;
 
+import com.daemitus.deadbolt.Deadbolt;
 import me.darqy.backpacks.util.SnooperApi;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.darqy.backpacks.command.*;
+import org.yi.acru.bukkit.Lockette.Lockette;
 
 public class Backpacks extends JavaPlugin {
     
@@ -22,11 +24,15 @@ public class Backpacks extends JavaPlugin {
     private File groupsFolder;
     
     private Map<String, BackpackManager> managers = new HashMap();
+    
+    private boolean hasLockette;
+    private boolean hasDeadbolt;
 
     @Override
     public void onEnable() {        
         try {
             reloadConfiguration();
+            initHooks();
             registerCommands();
             scheduleBackpackSaver();
             SnooperApi.setPlugin(this);
@@ -76,15 +82,6 @@ public class Backpacks extends JavaPlugin {
         }
     }
     
-    public static Player matchPlayer(CommandSender sender, String target) {
-        Player player = Bukkit.getPlayer(target);
-        if (player == null) {
-            sender.sendMessage(ChatColor.RED + target + " not found online");
-        }
-        return player;
-    }
-    
-    
     private void reloadConfiguration() throws IOException {
         File groupsFile = new File(getDataFolder(), "groups.yml");
         
@@ -102,6 +99,11 @@ public class Backpacks extends JavaPlugin {
         }
         
         config = new BackpacksConfig(YamlConfiguration.loadConfiguration(configFile));
+    }
+
+    private void initHooks() {
+        hasLockette = getServer().getPluginManager().isPluginEnabled("Lockette");
+        hasDeadbolt = getServer().getPluginManager().isPluginEnabled("Deadbolt");
     }
     
     private void registerCommands() {
@@ -130,6 +132,26 @@ public class Backpacks extends JavaPlugin {
             plugin.saveAllBackpacks();
         }
         
+    }
+    
+    public boolean checkProtection(Player p, org.bukkit.block.Block b) {
+        if (hasLockette) {
+            return Lockette.isProtected(b)? Lockette.isUser(b, p.getName(), true) : true;
+        }
+        
+        if (hasDeadbolt) {
+            return Deadbolt.isProtected(b)? Deadbolt.isAuthorized(p, b) : true;
+        }
+        
+        return true;
+    }
+    
+    public static Player matchPlayer(CommandSender sender, String target) {
+        Player player = Bukkit.getPlayer(target);
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + target + " not found online");
+        }
+        return player;
     }
     
 }

@@ -72,7 +72,7 @@ public final class InventoryUtil {
      * @return whether the transfer could proceed and was successful
      */
     public static boolean transferItems(Inventory from, Inventory to, String item) {
-        if (item.equals("*")) {
+        if (item.equals("*") || item.equals("all")) {
             org.bukkit.inventory.ItemStack[] items = removeNull(from.getContents());
             from.clear();
 

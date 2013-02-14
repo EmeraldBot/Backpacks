@@ -2,6 +2,7 @@ name: Backpacks
 version: 1.0
 main: me.darqy.backpacks.Backpacks
 author: Darq_Alder
+softdepend: [Lockette, Deadbolt]
 
 description: Multiple, multi-world backpacks
 commands:

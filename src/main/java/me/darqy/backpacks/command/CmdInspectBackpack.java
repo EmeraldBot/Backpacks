@@ -25,7 +25,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
             return true;
         }
         
-        if (!s.hasPermission("backpack.inspect")) {
+        if (!Permissions.inspectBackpack(s)) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -62,7 +62,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
             return true;
         }
         
-        pack.inspect(p, p.hasPermission("backpack.inspect.edit"));
+        pack.inspect(p, Permissions.inspectAndEditBackpack(s));
         s.sendMessage(ChatColor.YELLOW + "Viewing " + player + "'s \"" + backpack + "\" backpack");
         return true;
     }

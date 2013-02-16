@@ -68,7 +68,7 @@ public class Backpacks extends JavaPlugin {
     }
     
     public BackpackManager getManager(String world) {
-        if (config.getConfiguredWorldsOnly() && !groupConfig.configured(world)) {
+        if (BackpacksConfig.getConfiguredWorldsOnly() && !groupConfig.configured(world)) {
             return null;
         }
         String group = groupConfig.getGroup(world);
@@ -116,7 +116,7 @@ public class Backpacks extends JavaPlugin {
     
     private void scheduleBackpackSaver() {
         getServer().getScheduler().scheduleSyncRepeatingTask(
-                this, new BackpackSaver(this), 0L, config.getSaveInterval());
+                this, new BackpackSaver(this), 0L, BackpacksConfig.getSaveInterval());
     }
     
     private static class BackpackSaver implements Runnable {

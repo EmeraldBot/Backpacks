@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import me.darqy.backpacks.Backpack;
 import me.darqy.backpacks.BackpackManager;
 import me.darqy.backpacks.Backpacks;
+import me.darqy.backpacks.BackpacksConfig;
 
 public class CmdCreateBackpack implements CommandExecutor {
     
@@ -20,9 +21,8 @@ public class CmdCreateBackpack implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
-        boolean named = s.hasPermission("backpack.create.named");
-        if (!s.hasPermission("backpack.create.default")
-                && !named) {
+        boolean named = Permissions.createBackpackNamed(s);
+        if (!Permissions.createBackpack(s) && !named) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -37,7 +37,7 @@ public class CmdCreateBackpack implements CommandExecutor {
         }
         
         String player = s.getName();
-        boolean other = s.hasPermission("backpack.create.other");
+        boolean other = Permissions.createBackpackOther(s);
         if (args.length >= 2 && other) {
             player = args[1];
         }
@@ -53,10 +53,24 @@ public class CmdCreateBackpack implements CommandExecutor {
             s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
-        
+
         if (manager.hasBackpack(player, backpack)) {
             s.sendMessage(ChatColor.RED + "That backpack already exists.");
             return true;
+        }
+        
+        if (!Permissions.createBackpackLimitBypass(s)) {
+            int cap = BackpacksConfig.getMaximumBackpacks();
+            if (cap > 0) {
+                int backpacks = manager.getBackpackCount(player);
+                int max = Permissions.createBackpackLimit(s, cap);
+                
+                if (backpacks >= max) {
+                    s.sendMessage(ChatColor.RED + "Sorry, you've reached your backpack"
+                            + " limit of " + max);
+                    return true;
+                }
+            }
         }
         
         Backpack pack = new Backpack(Bukkit.createInventory(null, 54, "Backpack - " + backpack));

@@ -24,9 +24,8 @@ public class CmdBackpack implements CommandExecutor {
             return true;
         }
         
-        boolean named = s.hasPermission("backpack.use.named");
-        if (!s.hasPermission("backpack.use.default")
-                && !named) {
+        boolean named = Permissions.useBackpackNamed(s);
+        if (!Permissions.useBackpack(s) && !named) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }

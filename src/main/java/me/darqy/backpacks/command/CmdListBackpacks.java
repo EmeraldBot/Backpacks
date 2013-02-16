@@ -1,5 +1,6 @@
 package me.darqy.backpacks.command;
 
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,9 +20,8 @@ public class CmdListBackpacks implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
-        boolean other = s.hasPermission("backpack.list.other");
-        if (!s.hasPermission("backpack.list")
-                && !other) {
+        boolean other = Permissions.listBackpacksOther(s);
+        if (!Permissions.listBackpacks(s) && !other) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -44,6 +44,7 @@ public class CmdListBackpacks implements CommandExecutor {
         }
         
         List<String> packs = manager.getBackpackList(player);
+        Collections.sort(packs);
         
         if (packs.isEmpty()) {
             s.sendMessage(ChatColor.YELLOW + "No backpacks found");

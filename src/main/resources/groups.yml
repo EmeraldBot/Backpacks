@@ -1,2 +1,6 @@
+## Groups config ##
+#Groups of worlds to "share" backacks. In the default
+#configuration, the group "default" has three worlds
+#who's backpack contents will be shared
 groups:
   default: [world, world_nether, world_the_end]

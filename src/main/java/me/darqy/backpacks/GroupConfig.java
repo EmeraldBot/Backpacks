@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 public class GroupConfig {
     
+    //          World,  Group
     private Map<String, String> groupMapping;
     
     public GroupConfig(Configuration config) {

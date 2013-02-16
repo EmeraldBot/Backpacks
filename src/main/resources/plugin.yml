@@ -4,7 +4,7 @@ main: me.darqy.backpacks.Backpacks
 author: Darq_Alder
 softdepend: [Lockette, Deadbolt]
 
-description: Multiple, multi-world backpacks
+description: Multiple, multi-world backpacks, with convenience utilities
 commands:
   createpack:
     description: Creates a new backpack
@@ -26,4 +26,3 @@ commands:
     description: Various utilities to help manage your backpack
     usage: /<command> [action] (p:[backpack])
     aliases: [upack]
-    

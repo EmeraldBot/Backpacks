@@ -19,7 +19,7 @@ public class BackpackManager {
     private Map<String, Map<String, Backpack>> backpacks = new HashMap();
     private Map<String, NBTTagCompound> nbts = new HashMap();
     
-    private File directory; //working directory
+    private File directory; // working directory
     
     public BackpackManager(File dir) {
         directory = dir;
@@ -85,6 +85,19 @@ public class BackpackManager {
         return list;
     }
     
+    /**
+     * How many backpacks does the player have
+     */
+    public int getBackpackCount(String player) {
+        if (nbts.containsKey(player)) {
+            return nbts.get(player).c().size();
+        }
+        return 0;
+    }
+    
+    /**
+     * Saves all backpacks that have been loaded
+     */
     public void saveBackpacks() throws IOException {
         for (String player : backpacks.keySet()) {
             checkPlayer(player);

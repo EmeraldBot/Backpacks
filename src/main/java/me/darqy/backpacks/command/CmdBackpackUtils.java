@@ -35,8 +35,6 @@ public class CmdBackpackUtils implements CommandExecutor  {
     private static final String RENAME_USAGE = "rename [new-pack]";
     private static final String EMPTY_USAGE = "empty";
     
-    
-    
     public CmdBackpackUtils(Backpacks instance) {
         this.plugin = instance;
         
@@ -51,7 +49,6 @@ public class CmdBackpackUtils implements CommandExecutor  {
         }
         
         final Player p = (Player) s;
-        final String player = p.getName();
                         
         if (args.length < 1) {
             handleHelp(c, p, null, l);
@@ -69,7 +66,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
             return true;
         }
         
-        if (!p.hasPermission("backpack.util." + action)) {
+        if (!Permissions.utilBackpack(s, action)) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -80,11 +77,13 @@ public class CmdBackpackUtils implements CommandExecutor  {
             return true;
         }
 
-        String backpack = "default";
-        String lArg = args[args.length - 1];
-        if (lArg.startsWith("p:") || lArg.startsWith("P:")) {
-            String[] parts = lArg.split(":");
-            if (parts.length == 2) backpack = parts[1];
+        
+        String backpack = getExtraArg(args, "p:", "default");
+        
+        String player = p.getName();
+        boolean other = Permissions.utilBackpackOther(s);
+        if (other) {
+            player = getExtraArg(args, "pl:", player);
         }
 
         Backpack pack = manager.getBackpack(player, backpack);
@@ -109,7 +108,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
                         .replace("(p:[backpack])", "[p:old-pack]"));
                 return true;
             }
-            handleRename(p, manager, backpack, args[1].toLowerCase());
+            handleRename(p, player, manager, backpack, args[1].toLowerCase());
         } else if ("empty".equals(action)) {
             if (args.length < 2) {
                 p.sendMessage(ChatColor.RED + "Not enough arguments.");
@@ -142,7 +141,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
             return;
         }
         
-        if (!plugin.checkProtection(p, target) && !p.hasPermission("backpack.util.chest.bypass")) {
+        if (!plugin.checkProtection(p, target) && !Permissions.utilBackpack(p, "chest.bypass")) {
             p.sendMessage(ChatColor.RED + "Sorry, you do not have access to that chest.");
             return;
         }
@@ -169,13 +168,14 @@ public class CmdBackpackUtils implements CommandExecutor  {
         }
     }
     
-    private void handleRename(Player p, BackpackManager mngr, String oldname, String newname) {
-        if (mngr.hasBackpack(p.getName(), newname)) {
-            p.sendMessage(ChatColor.RED + "The backpack you're trying to rename this to already exists.");
+    private void handleRename(Player p, String owner, BackpackManager mngr, String oldname, String newname) {
+        if (mngr.hasBackpack(owner, newname)) {
+            p.sendMessage(ChatColor.RED + "You can not remanme that backpack to \"" + newname + "\""
+                    + ", it already exists");
             return;
         }
         
-        mngr.renameBackpack(p.getName(), oldname, newname);
+        mngr.renameBackpack(owner, oldname, newname);
         p.sendMessage(ChatColor.YELLOW + "Your \"" + oldname + "\" backpack is renamed to: \"" + newname + "\"");
     }
     
@@ -248,6 +248,19 @@ public class CmdBackpackUtils implements CommandExecutor  {
             }
         }
         return null;
+    }
+    
+    private static String getExtraArg(String[] args, String prefix, String def) {
+        for (int i = args.length - 1; i > 0; i--) {
+            String arg = args[i];
+            if (arg.startsWith(prefix)) {
+                String str = arg.substring(prefix.length());
+                if (!str.isEmpty()) {
+                    return str;
+                }
+            }
+        }
+        return def;
     }
     
     private static String getUsage(Command c, ChatColor color, String label, String usage) {

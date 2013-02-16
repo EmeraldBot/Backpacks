@@ -1,5 +1,15 @@
-#interval between backpack saves to disk. Defaul: 6000 (5 minutes)
+## Backpacks configuration ##
+
+# The interval, in ticks (1/20 second), between backpack saves
+# to disk
 save-interval: 6000
-#If set to true and a user tries to open a pack
-#in a world that isn't configured, deny it
+
+# If true, a player will not be able to use backpack commands
+# if the world isn't properly configured in groups.yml
 configured-world-only: true
+
+# The maximum amount of backpacks a player may have, regardless of
+# their backpack.create.limit.<limit> node. This setting should be
+# reasonably low, so not too many permission checks are made.
+# Setting to 0 will disable the limit
+maximum-backpacks-per-group: 8

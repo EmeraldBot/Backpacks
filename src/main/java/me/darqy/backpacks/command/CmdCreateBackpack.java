@@ -1,15 +1,14 @@
 package me.darqy.backpacks.command;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import me.darqy.backpacks.Backpack;
 import me.darqy.backpacks.BackpackManager;
 import me.darqy.backpacks.Backpacks;
 import me.darqy.backpacks.BackpacksConfig;
+import me.darqy.backpacks.PlayerBackpacks;
 
 public class CmdCreateBackpack implements CommandExecutor {
     
@@ -53,8 +52,9 @@ public class CmdCreateBackpack implements CommandExecutor {
             s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
+        PlayerBackpacks backpacks = manager.getPlayerBackpacks(player);
 
-        if (manager.hasBackpack(player, backpack)) {
+        if (backpacks.hasBackpack(backpack)) {
             s.sendMessage(ChatColor.RED + "That backpack already exists.");
             return true;
         }
@@ -62,10 +62,10 @@ public class CmdCreateBackpack implements CommandExecutor {
         if (!Permissions.createBackpackLimitBypass(s)) {
             int cap = BackpacksConfig.getMaximumBackpacks();
             if (cap > 0) {
-                int backpacks = manager.getBackpackCount(player);
+                int count = manager.getBackpackCount(player);
                 int max = Permissions.createBackpackLimit(s, cap);
                 
-                if (backpacks >= max) {
+                if (count >= max) {
                     s.sendMessage(ChatColor.RED + "Sorry, you've reached your backpack"
                             + " limit of " + max);
                     return true;
@@ -73,8 +73,7 @@ public class CmdCreateBackpack implements CommandExecutor {
             }
         }
         
-        Backpack pack = new Backpack(Bukkit.createInventory(null, 54, "Backpack - " + backpack));
-        manager.setBackpack(player, backpack, pack);
+        backpacks.createBackpack(backpack);
         s.sendMessage(ChatColor.YELLOW + "Created the new backpack: \"" + backpack + "\"");
         
         return true;

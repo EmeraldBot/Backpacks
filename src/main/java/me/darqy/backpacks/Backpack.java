@@ -1,9 +1,7 @@
 package me.darqy.backpacks;
 
 import java.util.HashMap;
-import me.darqy.backpacks.util.InventoryUtil;
 import me.darqy.backpacks.util.SnooperApi;
-import net.minecraft.server.v1_4_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -13,14 +11,23 @@ import org.bukkit.inventory.ItemStack;
 
 public class Backpack {
     
+    public static final int SIZE = 54;
+    
+    private String name;
     private Inventory inventory;
     
-    public Backpack(Inventory inventory) {
-        this.inventory = inventory;
+    public Backpack(String name) {
+        this.name = name;
+        this.inventory = Bukkit.createInventory(null, SIZE, "Backpack - " + name);
     }
     
-    public Backpack(NBTTagCompound nbt, String name) {
-        inventory = InventoryUtil.invFromNbt(nbt, "Backpack - " + name);
+    public Backpack(String name, Inventory inventory) {
+        this.name = name;
+        this.inventory = inventory;
+    }
+        
+    public String getName() {
+        return name;
     }
     
     public Inventory getInventory() {
@@ -45,11 +52,12 @@ public class Backpack {
         return left.isEmpty()? 0 : left.get(0).getAmount();
     }
     
-    public void rename(String title) {
+    public void rename(String name) {
         closeAll();
+        this.name = name;
         
         ItemStack[] contents = inventory.getContents();
-        inventory = Bukkit.createInventory(null, contents.length, "Backpack - " + title);
+        inventory = Bukkit.createInventory(null, contents.length, "Backpack - " + name);
         inventory.setContents(contents);
     }
     

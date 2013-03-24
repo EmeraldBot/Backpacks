@@ -39,7 +39,7 @@ public class CmdBackpack implements CommandExecutor {
             return true;
         }
         
-        Backpack pack = manager.getBackpack(s.getName(), backpack);
+        Backpack pack = manager.getPlayerBackpacks(s.getName()).getBackpack(backpack);
         if (pack == null) {
             s.sendMessage(ChatColor.RED + "You don't have that backpack.");
             return true;

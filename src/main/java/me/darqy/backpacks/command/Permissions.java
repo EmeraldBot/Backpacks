@@ -1,7 +1,6 @@
 package me.darqy.backpacks.command;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Permissions {
 

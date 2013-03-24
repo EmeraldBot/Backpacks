@@ -2,12 +2,12 @@ package me.darqy.backpacks.command;
 
 import java.util.Collections;
 import java.util.List;
+import me.darqy.backpacks.BackpackManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import me.darqy.backpacks.BackpackManager;
 import me.darqy.backpacks.Backpacks;
 
 public class CmdListBackpacks implements CommandExecutor {

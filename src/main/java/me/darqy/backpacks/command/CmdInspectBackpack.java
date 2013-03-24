@@ -55,8 +55,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
             return true;
         }
         
-        Backpack pack = manager.getBackpack(player, backpack);
-        
+        Backpack pack = manager.getPlayerBackpacks(player).getBackpack(backpack);
         if (pack == null) {
             s.sendMessage(ChatColor.RED + "That backpack doesn't exist");
             return true;

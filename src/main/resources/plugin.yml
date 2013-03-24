@@ -26,3 +26,6 @@ commands:
     description: Various utilities to help manage your backpack
     usage: /<command> [action] (p:[backpack])
     aliases: [upack]
+permissions:
+  backpacks.create.limit.bypass:
+    default: false

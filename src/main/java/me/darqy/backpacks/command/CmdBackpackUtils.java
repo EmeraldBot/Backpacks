@@ -5,6 +5,7 @@ import java.util.Map;
 import me.darqy.backpacks.Backpack;
 import me.darqy.backpacks.BackpackManager;
 import me.darqy.backpacks.Backpacks;
+import me.darqy.backpacks.PlayerBackpacks;
 import me.darqy.backpacks.util.InventoryUtil;
 import me.darqy.backpacks.util.NMSUtil;
 import org.bukkit.ChatColor;
@@ -86,7 +87,8 @@ public class CmdBackpackUtils implements CommandExecutor  {
             player = getExtraArg(args, "pl:", player);
         }
 
-        Backpack pack = manager.getBackpack(player, backpack);
+        PlayerBackpacks packs = manager.getPlayerBackpacks(player);
+        Backpack pack = packs.getBackpack(backpack);
         if (pack == null) {
             s.sendMessage(ChatColor.RED + "You don't have that backpack.");
             return true;
@@ -108,7 +110,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
                         .replace("(p:[backpack])", "[p:old-pack]"));
                 return true;
             }
-            handleRename(p, player, manager, backpack, args[1].toLowerCase());
+            handleRename(p, player, manager, packs, backpack, args[1].toLowerCase());
         } else if ("empty".equals(action)) {
             if (args.length < 2) {
                 p.sendMessage(ChatColor.RED + "Not enough arguments.");
@@ -168,8 +170,8 @@ public class CmdBackpackUtils implements CommandExecutor  {
         }
     }
     
-    private void handleRename(Player p, String owner, BackpackManager mngr, String oldname, String newname) {
-        if (mngr.hasBackpack(owner, newname)) {
+    private void handleRename(Player p, String owner, BackpackManager mngr, PlayerBackpacks packs, String oldname, String newname) {
+        if (packs.hasBackpack(newname)) {
             p.sendMessage(ChatColor.RED + "You can not remanme that backpack to \"" + newname + "\""
                     + ", it already exists");
             return;

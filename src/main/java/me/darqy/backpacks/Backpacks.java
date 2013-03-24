@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.darqy.backpacks.command.*;
+import org.bukkit.event.HandlerList;
 import org.yi.acru.bukkit.Lockette.Lockette;
 
 public class Backpacks extends JavaPlugin {
@@ -31,13 +32,16 @@ public class Backpacks extends JavaPlugin {
     @Override
     public void onEnable() {        
         try {
+            Class.forName("net.minecraft.server.v1_5_R2.NBTBase");
             reloadConfiguration();
             initHooks();
             registerCommands();
             scheduleBackpackSaver();
             SnooperApi.setPlugin(this);
         } catch (Exception e) {
-            getLogger().log(Level.WARNING, "Error enabling myself :(: ", e);
+            getLogger().log(Level.SEVERE, "Error enabling myself :( ", e);
+            HandlerList.unregisterAll(this);
+            setEnabled(false);
         }
     }
     
@@ -74,7 +78,7 @@ public class Backpacks extends JavaPlugin {
         String group = groupConfig.getGroup(world);
         
         if (!managers.containsKey(group)) {
-            BackpackManager mngr = new BackpackManager(new File(groupsFolder, group));
+            BackpackManager mngr = new NBTBackpackManager(new File(groupsFolder, group));
             managers.put(group, mngr);
             return mngr;
         } else {
@@ -138,11 +142,9 @@ public class Backpacks extends JavaPlugin {
         if (hasLockette) {
             return Lockette.isProtected(b)? Lockette.isUser(b, p.getName(), true) : true;
         }
-        
         if (hasDeadbolt) {
             return Deadbolt.isProtected(b)? Deadbolt.isAuthorized(p, b) : true;
         }
-        
         return true;
     }
     

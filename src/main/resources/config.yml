@@ -13,3 +13,15 @@ configured-world-only: true
 # reasonably low, so not too many permission checks are made.
 # Setting to 0 will disable the limit
 maximum-backpacks-per-group: 8
+
+# The backend to use: (available: yaml, nbt)
+# nbt will only work when the compiled Minecraft version of Backpacks
+# matches up with the Minecraft version on your server. Due to version
+# safeguard implemented by bukkit. Will automatically set to yaml if
+# versions don't match.
+backend: nbt
+
+# Set to convert from a backend to the current in-use backend
+# Will archive any existing files
+# if set to false, no converting
+convert: false

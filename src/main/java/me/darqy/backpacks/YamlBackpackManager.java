@@ -3,19 +3,17 @@ package me.darqy.backpacks;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class YamlBackpackManager implements BackpackManager {
+public class YamlBackpackManager extends BackpackManager {
     
     private static final String slot = "slot.";
     
     private final File folder;
-    private final HashMap<String, PlayerBackpacks> backpacks = new HashMap<String, PlayerBackpacks>();
     
     public YamlBackpackManager(File file) {
         this.folder = file;
@@ -30,6 +28,22 @@ public class YamlBackpackManager implements BackpackManager {
         for (PlayerBackpacks player : backpacks.values()) {
             for (Backpack pack : player.getBackpacks()) {
                 saveBackpack(player.getPlayer(), pack);
+            }
+        }
+    }
+    
+    @Override
+    public void loadAll() {
+        for (File file : folder.listFiles()) {
+            if (!file.isDirectory()) {
+                continue;
+            }
+            
+            String player = file.getName();
+            for (File backpack : file.listFiles()) {
+                if (backpack.getName().endsWith(".yml")) {
+                    loadBackpack(player, backpack.getName().substring(0, backpack.getName().length() - 4));
+                }
             }
         }
     }
@@ -72,8 +86,7 @@ public class YamlBackpackManager implements BackpackManager {
         ArrayList<String> list = new ArrayList();
         for (File child : playerFolder.listFiles()) {
             if (child.getName().endsWith(".yml")) {
-                int i = child.getName().lastIndexOf('.');
-                list.add(child.getName().substring(0, i));
+                list.add(child.getName().substring(0, child.getName().length() - 4));
             }
         }
         return list;
@@ -103,23 +116,6 @@ public class YamlBackpackManager implements BackpackManager {
         return true;
     }
 
-    @Override
-    public void closeBackpacks() {
-        for (PlayerBackpacks player : backpacks.values()) {
-            for (Backpack pack : player.getBackpacks()) {
-                pack.closeAll();
-            }
-        }
-    }
-
-    @Override
-    public PlayerBackpacks getPlayerBackpacks(String player) {
-        if (!backpacks.containsKey(player)) {
-            backpacks.put(player, new PlayerBackpacks(this, player));
-        }
-        return backpacks.get(player);
-    }
-    
     @Override
     public void renameBackpack(String player, String oldpack, String newpack) {
         File file = getBackpackFile(player, oldpack);

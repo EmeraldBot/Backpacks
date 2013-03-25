@@ -1,5 +1,5 @@
 name: Backpacks
-version: 1.1
+version: 1.2
 main: me.darqy.backpacks.Backpacks
 author: Darq_Alder
 softdepend: [Lockette, Deadbolt]
@@ -26,6 +26,9 @@ commands:
     description: Various utilities to help manage your backpack
     usage: /<command> [action] (p:[backpack])
     aliases: [upack]
+  backpacks:
+    description: Admin commands
+    usage: /<command> [reload|backup]
 permissions:
   backpacks.create.limit.bypass:
     default: false

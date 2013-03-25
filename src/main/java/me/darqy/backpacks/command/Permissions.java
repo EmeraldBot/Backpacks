@@ -64,6 +64,10 @@ public class Permissions {
     public static boolean utilBackpackOther(CommandSender sender) {
         return check(sender, "util.other");
     }
+    
+    public static boolean backpacksAdmin(CommandSender sender) {
+        return check(sender, "admin");
+    }
 
     private static final String PREFIX = "backpacks.";
 

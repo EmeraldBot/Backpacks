@@ -15,11 +15,11 @@ import net.minecraft.server.v1_5_R2.NBTBase;
 import net.minecraft.server.v1_5_R2.NBTTagCompound;
 import org.bukkit.inventory.Inventory;
 
-public class NBTBackpackManager implements BackpackManager {
+public class NBTBackpackManager extends BackpackManager {
 
     private File folder;
-    private Map<String, PlayerBackpacks> backpacks = new HashMap();
     private Map<String, NBTTagCompound> tags = new HashMap();
+    
 
     public NBTBackpackManager(File dir) {
         folder = dir;
@@ -27,23 +27,6 @@ public class NBTBackpackManager implements BackpackManager {
         if (!folder.isDirectory()) {
             throw new IllegalArgumentException("File must be a directory!");
         }
-    }
-
-    @Override
-    public void closeBackpacks() {
-        for (PlayerBackpacks player : backpacks.values()) {
-            for (Backpack pack : player.getBackpacks()) {
-                pack.closeAll();
-            }
-        }
-    }
-
-    @Override
-    public PlayerBackpacks getPlayerBackpacks(String player) {
-        if (!backpacks.containsKey(player)) {
-            backpacks.put(player, new PlayerBackpacks(this, player));
-        }
-        return backpacks.get(player);
     }
 
     @Override
@@ -101,6 +84,25 @@ public class NBTBackpackManager implements BackpackManager {
         Inventory inv = InventoryUtil.invFromNbt((NBTTagCompound) tag.get(backpack), backpack);
         getPlayerBackpacks(player).setBackpack(backpack, new Backpack(backpack, inv));
         return true;
+    }
+    
+    @Override
+    public void loadAll() {
+        for (File file : folder.listFiles()) {
+            if (file.getName().endsWith(".dat")) {
+                String player = file.getName().substring(0, file.getName().length() - 4);
+                NBTTagCompound tag = getNBT(player);
+                if (tag.isEmpty()) {
+                    continue;
+                }
+                
+                for (Object o : getNBT(player).c()) {
+                    if (o instanceof NBTTagCompound) {
+                        loadBackpack(player, ((NBTTagCompound) o).getString("Name"));
+                    }
+                }
+            }
+        }
     }
     
     private void saveBackpack(String player, Backpack backpack) throws IOException {

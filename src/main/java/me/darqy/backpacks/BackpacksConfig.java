@@ -1,18 +1,25 @@
 package me.darqy.backpacks;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class BackpacksConfig {
     
+    private static FileConfiguration config;
+    
     private static long saveInterval = 6000;
     private static boolean configuredOnly = true;
-    
     private static int maximumBackpacks = 8;
+    private static String backend = "nbt";
+    private static String convert = "false";
     
-    public BackpacksConfig(Configuration config) {
+    public BackpacksConfig(YamlConfiguration config) {
+        this.config = config;
         saveInterval = config.getLong("save-interval");
         configuredOnly = config.getBoolean("configured-world-only");
         maximumBackpacks = config.getInt("maximum-backpacks-per-group");
+        backend = config.getString("backend");
+        convert = config.getString("convert");
     }
     
     
@@ -38,6 +45,24 @@ public class BackpacksConfig {
      */
     public static int getMaximumBackpacks() {
         return maximumBackpacks;
+    }
+    
+    /**
+     * The backend used to save backpacks
+     */
+    public static String getBackend() {
+        return backend;
+    }
+    
+    /**
+     * Which backend to convert from
+     */
+    public static String getConverter() {
+        return convert;
+    }
+    
+    public static FileConfiguration getConfiguration() {
+        return config;
     }
     
 }

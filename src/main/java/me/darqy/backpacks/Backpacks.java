@@ -42,7 +42,7 @@ public class Backpacks extends JavaPlugin {
             reloadConfiguration();
             backend = getBackend(BackpacksConfig.getBackend());
             if (backend == Backend.NONE) {
-                getLogger().warning("Misconfigeed backend. Defaulting to yaml.");
+                getLogger().warning("Misconfigured backend. Defaulting to yaml.");
                 backend = Backend.YAML;
             }
             handleConversion();

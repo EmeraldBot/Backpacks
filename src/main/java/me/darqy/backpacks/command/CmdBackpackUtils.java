@@ -18,11 +18,12 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class CmdBackpackUtils implements CommandExecutor  {
+public class CmdBackpackUtils implements CommandExecutor {
     
     private Backpacks plugin;
     private MagnetListener magnet = this.new MagnetListener();
@@ -301,7 +302,7 @@ public class CmdBackpackUtils implements CommandExecutor  {
         
         @EventHandler(ignoreCancelled = true)
         public void randomPop(PlayerPickupItemEvent event) {
-           final Player p = event.getPlayer();
+            final Player p = event.getPlayer();
             final Item item = event.getItem();
             final ItemStack itemstack = item.getItemStack();
             final String player = p.getName();
@@ -322,6 +323,15 @@ public class CmdBackpackUtils implements CommandExecutor  {
                 }
                 
                 event.setCancelled(true);
+            }
+        }
+        
+        @EventHandler
+        public void onWorldChange(PlayerChangedWorldEvent event) {
+            final String player = event.getPlayer().getName();
+            
+            if (magnetEnabled(player)) {
+                disableMagnet(player);
             }
         }
         

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.server.v1_5_R3.NBTBase;
-import net.minecraft.server.v1_5_R3.NBTTagCompound;
+import net.minecraft.server.v1_6_R3.NBTBase;
+import net.minecraft.server.v1_6_R3.NBTTagCompound;
 import org.bukkit.inventory.Inventory;
 
 public class NBTBackpackManager extends BackpackManager {
@@ -125,7 +125,8 @@ public class NBTBackpackManager extends BackpackManager {
             if (data.exists()) {
                 try {
                     DataInputStream din = new DataInputStream(new FileInputStream(data));
-                    tags.put(player, (NBTTagCompound) NBTBase.b(din));
+                    tags.put(player, (NBTTagCompound) NBTBase.a(din));
+                    
                     din.close();
                 } catch (IOException e) {
                     e.printStackTrace();

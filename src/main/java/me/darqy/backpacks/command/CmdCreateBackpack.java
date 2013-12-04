@@ -20,8 +20,9 @@ public class CmdCreateBackpack implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
-        boolean named = Permissions.createBackpackNamed(s);
-        if (!Permissions.createBackpack(s) && !named) {
+        final boolean named = Permissions.createBackpackNamed(s);
+        final int pack_limit = Permissions.createBackpackLimit(s, BackpacksConfig.getMaximumBackpacks());
+        if (pack_limit < 1 && !named) {
             s.sendMessage(ChatColor.RED + "You don't have permission.");
             return true;
         }
@@ -30,7 +31,7 @@ public class CmdCreateBackpack implements CommandExecutor {
         if (args.length >= 1 && named) {
             backpack = args[0].toLowerCase();
             if (backpack.length() > 16) {
-                s.sendMessage(ChatColor.YELLOW + "Please keep backpack name under 16 characters");
+                s.sendMessage(ChatColor.YELLOW + "Please choose a backpack name under 16 characters");
                 return true;
             }
         }
@@ -47,11 +48,12 @@ public class CmdCreateBackpack implements CommandExecutor {
             return true;
         }
 
-        BackpackManager manager = plugin.getManager(world);
+        BackpackManager manager = plugin.getBackpackManager(world);
         if (manager == null) {
             s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;
         }
+        
         PlayerBackpacks backpacks = manager.getPlayerBackpacks(player);
 
         if (backpacks.hasBackpack(backpack)) {
@@ -59,24 +61,33 @@ public class CmdCreateBackpack implements CommandExecutor {
             return true;
         }
         
-        if (!Permissions.createBackpackLimitBypass(s)) {
-            int cap = BackpacksConfig.getMaximumBackpacks();
-            if (cap > 0) {
-                int count = manager.getBackpackCount(player);
-                int max = Permissions.createBackpackLimit(s, cap);
-                
-                if (count >= max) {
-                    s.sendMessage(ChatColor.RED + "Sorry, you've reached your backpack"
-                            + " limit of " + max);
-                    return true;
-                }
-            }
+        if (player.equals(s.getName()) && !canCreateMoreBackpacks(manager, s)) {
+            s.sendMessage(ChatColor.RED + "Sorry, you've reached your backpack"
+                            + " limit of " + pack_limit);
+            return true;
         }
         
         backpacks.createBackpack(backpack);
         s.sendMessage(ChatColor.YELLOW + "Created the new backpack: \"" + backpack + "\"");
-        
+
         return true;
+    }
+    
+    
+    public static boolean canCreateMoreBackpacks(BackpackManager manager, CommandSender sender) {
+        if (Permissions.createBackpackLimitBypass(sender)) {
+            return true;
+        }
+
+        int cap = BackpacksConfig.getMaximumBackpacks();
+        if (cap <= 0) {
+            return true;
+        }
+
+        int count = manager.getBackpackCount(sender.getName());
+        int max = Permissions.createBackpackLimit(sender, cap);
+
+        return count < max;
     }
     
 }

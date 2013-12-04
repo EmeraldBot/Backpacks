@@ -43,8 +43,10 @@ public class PlayerBackpacks {
         return player;
     }
 
-    public void createBackpack(String backpack) {
-        backpacks.put(backpack, new Backpack(backpack));
+    public Backpack createBackpack(String backpack) {
+        Backpack pack = new Backpack(backpack);
+        backpacks.put(backpack, pack);
+        return pack;
     }
 
     public Collection<Backpack> getBackpacks() {

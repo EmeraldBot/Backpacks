@@ -2,12 +2,12 @@ package me.darqy.backpacks.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.server.v1_6_R3.ItemStack;
-import net.minecraft.server.v1_6_R3.NBTTagCompound;
-import net.minecraft.server.v1_6_R3.NBTTagList;
+import net.minecraft.server.v1_7_R1.ItemStack;
+import net.minecraft.server.v1_7_R1.NBTTagCompound;
+import net.minecraft.server.v1_7_R1.NBTTagList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 public final class InventoryUtil {
@@ -47,8 +47,8 @@ public final class InventoryUtil {
      */
     public static Inventory invFromNbt(NBTTagCompound tag, String title) {
         final int size = tag.getInt("size");
-        final Inventory inventory = Bukkit.createInventory(null, size, "Backpack - " + title);
-        final NBTTagList contents = tag.getList("contents");
+        final Inventory inventory = Bukkit.createInventory(null, size, title);
+        final NBTTagList contents = tag.getList("contents", 10 /* NBTTagCompound id*/); 
 
         for (int i = 0, length = contents.size(); i < length; i++) {
             NBTTagCompound nbt = (NBTTagCompound) contents.get(i);

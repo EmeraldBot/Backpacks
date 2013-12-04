@@ -38,7 +38,8 @@ public class Permissions {
                 return i;
             }
         }
-        return 1;
+        
+        return createBackpack(sender)? 1 : 0; // without createBackpack permission, limit is 0
     }
 
     public static boolean inspectBackpack(CommandSender sender) {

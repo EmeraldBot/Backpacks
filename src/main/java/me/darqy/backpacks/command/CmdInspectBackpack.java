@@ -49,7 +49,7 @@ public class CmdInspectBackpack implements CommandExecutor, Listener {
             return true;
         }
 
-        BackpackManager manager = plugin.getManager(world);
+        BackpackManager manager = plugin.getBackpackManager(world);
         if (manager == null) {
             s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;

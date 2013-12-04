@@ -37,7 +37,7 @@ public class CmdListBackpacks implements CommandExecutor {
             player = args[1];
         }
 
-        BackpackManager manager = plugin.getManager(world);
+        BackpackManager manager = plugin.getBackpackManager(world);
         if (manager == null) {
             s.sendMessage(ChatColor.RED + "Sorry, can't do that in this world.");
             return true;

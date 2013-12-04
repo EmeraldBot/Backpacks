@@ -22,8 +22,8 @@ public class SnooperApi {
     public enum InvSection {
         TOP, BOTTOM
     }
-    
-    public static void setPlugin(Plugin instance) {
+
+    public static void initialize(Plugin instance) {
         plugin = instance;
         plugin.getServer().getPluginManager().registerEvents(new Listener() {
             
@@ -67,7 +67,7 @@ public class SnooperApi {
     public static Constraint getSnooper(Player player) {
         if (player.hasMetadata(META_KEY)) {
             for (MetadataValue val : player.getMetadata(META_KEY)) {
-                if (val.getOwningPlugin() == plugin) {
+                if (val.getOwningPlugin().equals(plugin)) {
                     return (Constraint) val.value();
                 }
             }

@@ -22,11 +22,13 @@ import org.yi.acru.bukkit.Lockette.Lockette;
 
 public class Backpacks extends JavaPlugin {
 
-    private static final String NBT_CLASS = "net.minecraft.server.v1_6_R3.NBTBase";
+    private static final String NBT_CLASS = "net.minecraft.server.v1_7_R1.NBTBase";
+    
+    private final Map<String, BackpackManager> managers = new HashMap();
+    
     private GroupConfig groupConfig;
-    private BackpacksConfig config;
     private File groupsFolder;
-    private Map<String, BackpackManager> managers = new HashMap();
+    
     private boolean hasLockette;
     private boolean hasDeadbolt;
 
@@ -43,16 +45,17 @@ public class Backpacks extends JavaPlugin {
             backend = getBackend(BackpacksConfig.getBackend());
             if (backend == Backend.NONE) {
                 getLogger().warning("Misconfigured backend. Defaulting to yaml.");
+                BackpacksConfig.getConfig().set("backend", "yaml");
+                BackpacksConfig.save();
                 backend = Backend.YAML;
             }
             handleConversion();
             initHooks();
             registerCommands();
             scheduleBackpackSaver();
-            SnooperApi.setPlugin(this);
-            BackpacksConfig.getConfiguration().save(new File(getDataFolder(), "config.yml"));
-        } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error enabling: ", e);
+            SnooperApi.initialize(this);
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Error enabling:", e);
             setEnabled(false);
         }
     }
@@ -81,22 +84,23 @@ public class Backpacks extends JavaPlugin {
     }
 
     public BackpackManager getManager(World world) {
-        return getManager(world.getName());
+        return getBackpackManager(world.getName());
     }
 
-    public BackpackManager getManager(String world) {
+    public BackpackManager getBackpackManager(String world) {
         if (BackpacksConfig.getConfiguredWorldsOnly() && !groupConfig.configured(world)) {
             return null;
         }
         String group = groupConfig.getGroup(world);
-
-        if (!managers.containsKey(group)) {
-            BackpackManager mngr = getNewBackend(group, backend);
+        
+        BackpackManager mngr = managers.get(group);
+        
+        if (mngr == null) {
+            mngr = newBackpackManager(group, backend);
             managers.put(group, mngr);
-            return mngr;
-        } else {
-            return managers.get(group);
         }
+
+        return mngr;
     }
 
     private Backend getBackend(String configured) {
@@ -115,7 +119,7 @@ public class Backpacks extends JavaPlugin {
         return Backend.NONE;
     }
 
-    private BackpackManager getNewBackend(String group, Backend backend) {
+    private BackpackManager newBackpackManager(String group, Backend backend) {
         BackpackManager manager;
         switch (backend) {
             case NBT:
@@ -134,28 +138,33 @@ public class Backpacks extends JavaPlugin {
             return;
         }
         
-        File groups;
+        File data_dir;
         switch (converting) {
             case NBT:
-                groups = new File(groupsFolder, "nbt");
+                data_dir = new File(groupsFolder, "nbt");
                 break;
             case YAML:
-                groups = new File(groupsFolder, "yaml");
+                data_dir = new File(groupsFolder, "yaml");
                 break;
             default: return;
         }
         
+        if (!data_dir.exists()) {
+            getLogger().warning("Trying to convert from a format that doesn't exist.. aborting.");
+            return;
+        }
+        
         backup(backend, true); // backup and delete the backend we're converting to
-        for (File file : groups.listFiles()) {
+        for (File file : data_dir.listFiles()) {
             if (file.isDirectory()) {
                 try {
                     String group = file.getName();
                     long start = System.currentTimeMillis();
-                    BackpackManager manager = getNewBackend(group, converting);
+                    BackpackManager manager = newBackpackManager(group, converting);
                     // load all that we wish to convert
                     manager.loadAll();
                     // get manager to save to
-                    BackpackManager man = getNewBackend(group, backend);
+                    BackpackManager man = newBackpackManager(group, backend);
                     // transfer backpacks to new manager
                     man.setBackpacks(manager.getBackpacks());
                     // save, converting them to new format
@@ -169,7 +178,8 @@ public class Backpacks extends JavaPlugin {
             }
         }
         backup(converting, true); // backup converted files and delete
-        BackpacksConfig.getConfiguration().set("convert", "false");
+        BackpacksConfig.getConfig().set("convert", "false");
+        BackpacksConfig.save();
     }
     
     public void reload() {
@@ -227,7 +237,7 @@ public class Backpacks extends JavaPlugin {
             saveResource("config.yml", false);
         }
 
-        config = new BackpacksConfig(YamlConfiguration.loadConfiguration(configFile));
+        BackpacksConfig.load(configFile);
     }
 
     private void initHooks() {

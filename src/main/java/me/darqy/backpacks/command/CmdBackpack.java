@@ -41,8 +41,14 @@ public class CmdBackpack implements CommandExecutor {
         
         Backpack pack = manager.getPlayerBackpacks(s.getName()).getBackpack(backpack);
         if (pack == null) {
-            s.sendMessage(ChatColor.RED + "You don't have that backpack.");
-            return true;
+            if (backpack.equals("default") && CmdCreateBackpack.canCreateMoreBackpacks(manager, s)) {
+                s.sendMessage(ChatColor.YELLOW + "Default backpack not found... creating");
+                
+                pack = manager.getPlayerBackpacks(s.getName()).createBackpack(backpack);
+            } else {
+                s.sendMessage(ChatColor.RED + "You don't have that backpack.");
+                return true;
+            }
         }
         
         final Player player = (Player) s;

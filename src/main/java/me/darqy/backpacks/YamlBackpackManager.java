@@ -13,12 +13,12 @@ public class YamlBackpackManager extends BackpackManager {
     
     private static final String slot = "slot.";
     
-    private final File folder;
+    private final File data_dir;
     
     public YamlBackpackManager(File file) {
-        this.folder = file;
-        folder.mkdirs();
-        if (!folder.isDirectory()) {
+        this.data_dir = file;
+        data_dir.mkdirs();
+        if (!data_dir.isDirectory()) {
             throw new IllegalArgumentException("File must be a directory!");
         }
     }
@@ -34,7 +34,7 @@ public class YamlBackpackManager extends BackpackManager {
     
     @Override
     public void loadAll() {
-        for (File file : folder.listFiles()) {
+        for (File file : data_dir.listFiles()) {
             if (!file.isDirectory()) {
                 continue;
             }
@@ -70,7 +70,12 @@ public class YamlBackpackManager extends BackpackManager {
 
     @Override
     public int getBackpackCount(String player) {
-        File playerFolder = new File(folder, player);
+        File playerFolder = new File(data_dir, player);
+        
+        if (!playerFolder.exists()) {
+            return 0;
+        }
+        
         int count = 0;
         for (File child : playerFolder.listFiles()) {
             if (child.getName().endsWith(".yml")) {
@@ -82,7 +87,7 @@ public class YamlBackpackManager extends BackpackManager {
 
     @Override
     public List<String> getBackpackList(String player) {
-        File playerFolder = new File(folder, player);
+        File playerFolder = new File(data_dir, player);
         ArrayList<String> list = new ArrayList();
         for (File child : playerFolder.listFiles()) {
             if (child.getName().endsWith(".yml")) {
@@ -132,7 +137,7 @@ public class YamlBackpackManager extends BackpackManager {
     }
     
     private File getBackpackFile(String player, String backpack) {
-        return new File(folder, player + File.separator + backpack + ".yml");
+        return new File(data_dir, player + File.separator + backpack + ".yml");
     }
     
 }

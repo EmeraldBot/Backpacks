@@ -22,7 +22,7 @@ import org.yi.acru.bukkit.Lockette.Lockette;
 
 public class Backpacks extends JavaPlugin {
 
-    private static final String NBT_CLASS = "net.minecraft.server.v1_7_R1.NBTBase";
+    private static final String NBT_CLASS = "net.minecraft.server.v1_7_R2.NBTBase";
     
     private final Map<String, BackpackManager> managers = new HashMap();
     
